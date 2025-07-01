@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HoloWatch X Assistant</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background: black;
+      color: #e0f7fa;
+      overflow-x: hidden;
+    }
+
+    video.bg-video {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      min-width: 100%;
+      min-height: 100%;
+      z-index: -1;
+      object-fit: cover;
+      opacity: 0.25;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    .watch-container {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(15px);
+      padding: 30px 60px;
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .time {
+      font-size: 3.5rem;
+      color: #00ffe0;
+      text-shadow: 0 0 10px #00ffe0;
+    }
+
+    .date {
+      font-size: 1.2rem;
+      opacity: 0.8;
+    }
+
+    .chatbot {
+      max-width: 700px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 15px;
+      padding: 25px;
+      backdrop-filter: blur(15px);
+      box-shadow: 0 0 25px rgba(0, 255, 255, 0.15);
+    }
+
+    .chat-output {
+      height: 150px;
+      overflow-y: auto;
+      margin-bottom: 15px;
+      padding: 10px;
+      background-color: rgba(255, 255, 255, 0.03);
+      border-radius: 10px;
+    }
+
+    .chat-output p {
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    .chat-input {
+      display: flex;
+      gap: 10px;
+    }
+
+    .chat-input input {
+      flex: 1;
+      padding: 10px 15px;
+      border-radius: 10px;
+      border: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+
+    .chat-input button {
+      padding: 10px 20px;
+      background: #00ffe0;
+      border: none;
+      color: #000;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .chat-input button:hover {
+      background: #00bcd4;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Holographic Video Background -->
+  <video class="bg-video" autoplay muted loop>
+    <source src="https://assets.mixkit.co/videos/preview/mixkit-futuristic-hologram-identity-scan-4872-large.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+
+  <div class="container">
+    <div class="watch-container">
+      <div class="time" id="time">00:00:00</div>
+      <div class="date" id="date">Loading date...</div>
+    </div>
+
+    <!-- Chatbot -->
+    <div class="chatbot">
+      <div class="chat-output" id="chatOutput">
+        <p><strong>Assistant:</strong> Hello! Ask me anything about the HoloWatch X.</p>
+      </div>
+      <div class="chat-input">
+        <input type="text" id="userInput" placeholder="Type your question here..." />
+        <button onclick="handleUserInput()">Ask</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Clock
+    function updateTime() {
+      const now = new Date();
+      document.getElementById('time').textContent = now.toLocaleTimeString('en-GB');
+      document.getElementById('date').textContent = now.toDateString();
+    }
+    setInterval(updateTime, 1000);
+    updateTime();
+
+    // Chatbot logic
+    const responses = {
+      "how does this work": "The HoloWatch uses a real-time holographic interface powered by futuristic tech.",
+      "what is the purpose": "Its purpose is to redefine timekeeping with immersive, holographic experiences.",
+      "what is the inspiration": "It’s inspired by sci-fi films like Blade Runner and advanced wearable concepts.",
+      "can it be used daily": "Yes, with proper development, it can function as a stylish daily device.",
+      "hi": "Hello, futurist. How may I assist you?",
+      "hello": "Greetings from the future! Ask me anything.",
+      "who made this": "This concept was designed as a futuristic UI demo powered by HTML, CSS, and JavaScript."
+    };
+
+    function handleUserInput() {
+      const inputField = document.getElementById('userInput');
+      const input = inputField.value.trim().toLowerCase();
+      const output = document.getElementById('chatOutput');
+
+      let response = "I'm not sure how to answer that yet. Try asking about the HoloWatch.";
+      for (let key in responses) {
+        if (input.includes(key)) {
+          response = responses[key];
+          break;
+        }
+      }
+
+      output.innerHTML += `<p><strong>You:</strong> ${input}</p>`;
+      output.innerHTML += `<p><strong>Assistant:</strong> ${response}</p>`;
+      output.scrollTop = output.scrollHeight;
+
+      speak(response);
+      inputField.value = "";
+    }
+
+    // Text-to-Speech
+    function speak(text) {
+      const msg = new SpeechSynthesisUtterance(text);
+      msg.lang = "en-US";
+      msg.pitch = 1.2;
+      msg.rate = 1;
+      msg.volume = 1;
+      speechSynthesis.speak(msg);
+    }
+
+    // Enter key support
+    document.getElementById("userInput").addEventListener("keypress", function(e) {
+      if (e.key === "Enter") {
+        handleUserInput();
+      }
+    });
+
+    // Autofocus on load
+    window.onload = () => {
+      document.getElementById("userInput").focus();
+    };
+  </script>
+
+</body>
+</html>
